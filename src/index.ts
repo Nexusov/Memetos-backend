@@ -19,6 +19,7 @@ import {
 } from './models/index.js';
 
 import { AuthController } from './auth/index.js';
+import { GameController } from './game/index.js';
 
 const enviromentSchema = {
   type: 'object',
@@ -78,7 +79,8 @@ const main = async () => {
   await connectToDatabase(fastify);
 
   fastify
-    .register(AuthController, { prefix: '/api/auth' });
+    .register(AuthController, { prefix: '/api/auth' })
+    .register(GameController, { prefix: '/api/game' });
 
   const PORT = parseInt(fastify.config.PORT);
   await fastify.listen({
