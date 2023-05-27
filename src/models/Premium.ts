@@ -4,7 +4,7 @@ import { User } from './User.js';
 export class Premium extends Model {
   premiumId!: string;
   subscribedAt!: Date;
-  userId!: bigint;
+  userId!: number;
 
   user?: User;
 

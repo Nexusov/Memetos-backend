@@ -2,8 +2,8 @@ import { Model } from 'objection';
 import { User } from './User.js';
 
 export class DiscordConnection extends Model {
-  discordId!: bigint;
-  userId!: bigint;
+  discordId!: number;
+  userId!: number;
   refreshToken!: string;
 
   user?: User;

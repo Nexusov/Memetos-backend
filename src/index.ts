@@ -6,7 +6,7 @@ import fastifyEnv from '@fastify/env';
 import cors from '@fastify/cors';
 
 import knex from 'knex';
-import { Model } from 'objection';
+import { Model, knexSnakeCaseMappers } from 'objection';
 
 import console from 'node:console';
 
@@ -53,7 +53,8 @@ const initAuth = async (fastify: FastifyInstance) => {
 const connectToDatabase = async (fastify: FastifyInstance) => {
   const knexClient = knex.knex({
     client: 'pg',
-    connection: fastify.config.DATABASE_CONNECTION
+    connection: fastify.config.DATABASE_CONNECTION,
+    ...knexSnakeCaseMappers()
   });
 
   Model.knex(knexClient);
@@ -66,6 +67,7 @@ const connectToDatabase = async (fastify: FastifyInstance) => {
     Situation,
     User
   });
+  console.log('DB is working...');
 };
 
 const main = async () => {
@@ -90,6 +92,7 @@ const main = async () => {
 
 try {
   await main();
+  console.log('Server is working...');
 } catch (error) {
   console.error(error);
   process.exit(1);

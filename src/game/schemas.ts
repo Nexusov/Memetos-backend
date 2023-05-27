@@ -38,7 +38,7 @@ export const getLobbySchema: FastifySchema = {
     properties: {
       invite: { type: 'string' }
     },
-    required: ['inviteCode']
+    required: ['invite']
   },
 
   response: {

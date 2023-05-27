@@ -2,11 +2,11 @@ import { Model } from 'objection';
 import { User } from './User.js';
 
 export class Card extends Model {
-  cardId!: bigint;
+  cardId!: number;
   pictureUrl!: string;
   isNsfw!: boolean;
 
-  userId!: bigint | null;
+  userId!: number | null;
   author?: User;
 
   static get tableName () {

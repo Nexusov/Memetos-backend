@@ -6,7 +6,7 @@ import { Card } from './Card.js';
 import { Situation } from './Situation.js';
 
 export class User extends Model {
-  userId!: bigint;
+  userId!: number;
   name!: string;
   email!: string;
   avatarUrl!: string;
