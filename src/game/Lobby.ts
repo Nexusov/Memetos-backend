@@ -1,9 +1,10 @@
 import type { Player } from './Player.js';
-import type { ServerEvents, Card as GameCard } from './WebsocketEvents.js';
+import type { ServerEvents, Card as GameCard, BestMeme } from './WebsocketEvents.js';
 import { Card } from '../models/Card.js';
 
 export interface LobbySettings {
   maximumUsers: number;
+  roundsCount: number;
   cardsCount: number;
   voteDuration: number;
   chooseCardDuration: number;
@@ -21,8 +22,9 @@ const wait = (ms = 3000) => new Promise<void>((resolve) => setTimeout(() => reso
 export class Lobby {
   private _settings: LobbySettings = {
     maximumUsers: 7,
+    roundsCount: 3,
     cardsCount: 5,
-    voteDuration: 5,
+    voteDuration: 10,
     chooseCardDuration: 10,
     isNsfw: false,
     isAnonymousVotes: false,
@@ -35,6 +37,7 @@ export class Lobby {
   private players: Player[] = [];
 
   private state: GameState = 'idle';
+  private bestMeme: BestMeme | null = null;
 
   public constructor (ownerId: Player['userId'], inviteCode: string) {
     this.ownerId = ownerId;
@@ -168,19 +171,18 @@ export class Lobby {
     }
 
     const jokes = [
-      'Бедные разработчики смотрят, как миллион игроков играют в их игру, с одним проданным премиумом',
       'Когда пришёл на пару, а она уже закончилась',
-      'Дедлайн сдачи работы - 10:00\nТы в 9:59 -',
+      'Дедлайн сдачи работы - 10:00\nТы в 9:59',
       'Когда пришёл сдавать долги, а тебя отчислили',
       'Когда увидел цены на еду в столовой',
       'Когда учитель попросил дневник, а его опять съела собака'
     ];
 
     for (let round = 0; round < 3; round++) {
-      const randomJoke = Math.floor(Math.random() * jokes.length);
+      const joke = jokes[round];
       await this.broadcast({
         type: 'start_round',
-        data: { joke: jokes[randomJoke] }
+        data: { joke }
       });
 
       await wait(this._settings.chooseCardDuration * 1000);
@@ -199,6 +201,19 @@ export class Lobby {
         const voters = this.players
           .filter((voter) => voter.votedCard === selectedCard.cardId)
           .map((voter) => voter.userId);
+
+        if (!this.bestMeme || this.bestMeme.votes < voters.length) {
+          this.bestMeme = {
+            joke,
+            pictureUrl: selectedCard.pictureUrl,
+            votes: voters.length,
+            author: {
+              avatarUrl: player.avatarUrl,
+              name: player.name,
+              userId: player.userId
+            }
+          };
+        }
 
         cards.push({ voters, cardId: selectedCard.cardId });
         player.addMemePoints(voters.length);
@@ -225,6 +240,13 @@ export class Lobby {
         player.resetCards();
         await player.addCards(newCards[i]);
       }
+    }
+
+    if (this.bestMeme) {
+      await this.broadcast({
+        type: 'best_meme',
+        data: this.bestMeme
+      });
     }
 
     await this.broadcast({

@@ -29,6 +29,13 @@ interface VoteResults {
   cards: Pick<Card, 'cardId' | 'voters'>[]
 }
 
+export interface BestMeme {
+  joke: string
+  pictureUrl: string
+  votes: number
+  author: PlayerInfo
+}
+
 export type ServerEvents =
   WebsocketMessage<'lobby_info', { settings: LobbySettings, players: PlayerInfo[], ownerId: string }> |
 
@@ -37,6 +44,7 @@ export type ServerEvents =
 
   WebsocketMessage<'start_game'> |
   WebsocketMessage<'end_game', Required<Pick<Player, 'userId' | 'memePoints'>>[]> |
+  WebsocketMessage<'best_meme', BestMeme> |
 
   WebsocketMessage<'start_round', { joke: string }> |
   WebsocketMessage<'cards_update', Pick<Card, 'userId' | 'cardId' | 'pictureUrl'>[]> |
