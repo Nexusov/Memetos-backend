@@ -178,6 +178,12 @@ export class Lobby {
       'Когда учитель попросил дневник, а его опять съела собака'
     ];
 
+    // Шафл массива методом Фишера — Йетса
+    for (let i = jokes.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [jokes[i], jokes[j]] = [jokes[j], jokes[i]];
+    }
+
     for (let round = 0; round < 3; round++) {
       const joke = jokes[round];
       await this.broadcast({
